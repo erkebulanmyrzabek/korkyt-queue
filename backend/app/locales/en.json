@@ -1,0 +1,21 @@
+{
+  "bot": {
+    "ask_iin": "Please send your 12-digit IIN.",
+    "ask_photo": "Now send your photo.",
+    "invalid_iin": "The IIN must contain exactly 12 digits.",
+    "language_select": "Choose your interface language.",
+    "language_updated": "Language updated: {language_name}."
+  },
+  "queue": {
+    "join_success": "You have successfully joined the queue.\nYour queue number: {queue_number}",
+    "already_in_queue": "You are already in the queue.\nYour queue number: {queue_number}",
+    "position": "Your queue number: {queue_number}\nPeople ahead of you: {ahead}",
+    "rate_limit": "Too many requests.\nPlease try again in 1 minute.",
+    "notification_10": "There are 10 people ahead of you.",
+    "notification_5": "There are 5 people ahead of you.",
+    "notification_1": "There is 1 person ahead of you.\nPlease prepare to be called.",
+    "called": "Your turn has come.\nPlease proceed to Instructor №{instructor_number}.",
+    "not_found": "You are not registered in the queue yet. Use /start."
+  }
+}
+
