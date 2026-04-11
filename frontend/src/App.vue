@@ -1,29 +1,30 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { RouterLink, RouterView } from "vue-router";
+import { RouterView, useRoute } from "vue-router";
 
 const { locale, t } = useI18n();
+const route = useRoute();
 
 const languages = [
   { code: "kk", label: "Қазақша" },
   { code: "ru", label: "Русский" },
   { code: "en", label: "English" },
 ];
+
+const showHeader = computed(() => route.name !== "tv");
+const title = computed(() => t((route.meta.titleKey as string) || "app.brand"));
+const subtitle = computed(() => t((route.meta.subtitleKey as string) || "platform.defaultSubtitle"));
 </script>
 
 <template>
-  <div class="app-shell">
-    <header class="topbar">
+  <div class="app-shell" :class="{ 'tv-shell': route.name === 'tv' }">
+    <header v-if="showHeader" class="topbar">
       <div>
         <p class="eyebrow">{{ t("app.eyebrow") }}</p>
-        <h1 class="brand">{{ t("app.brand") }}</h1>
+        <h1 class="brand">{{ title }}</h1>
+        <p class="muted platform-meta">{{ subtitle }}</p>
       </div>
-
-      <nav class="nav">
-        <RouterLink to="/admin" class="nav-link">{{ t("nav.admin") }}</RouterLink>
-        <RouterLink to="/instructor" class="nav-link">{{ t("nav.instructor") }}</RouterLink>
-        <RouterLink to="/tv" class="nav-link">{{ t("nav.tv") }}</RouterLink>
-      </nav>
 
       <label class="language-switcher">
         <span>{{ t("app.language") }}</span>
@@ -40,4 +41,3 @@ const languages = [
     </main>
   </div>
 </template>
-
