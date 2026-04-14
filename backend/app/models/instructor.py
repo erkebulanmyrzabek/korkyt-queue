@@ -18,6 +18,7 @@ class Instructor(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
+    login: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     instructor_number: Mapped[int] = mapped_column(Integer, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[InstructorStatus] = mapped_column(
@@ -30,4 +31,3 @@ class Instructor(Base):
 
     queue_entries: Mapped[list["QueueEntry"]] = relationship(back_populates="instructor")
     service_sessions: Mapped[list["ServiceSession"]] = relationship(back_populates="instructor")
-
