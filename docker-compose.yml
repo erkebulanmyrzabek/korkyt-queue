@@ -104,6 +104,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      VITE_DEV_PROXY_TARGET: http://api:8000
     command: sh -c "find node_modules -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true; npm install --no-package-lock && npm run dev -- --host 0.0.0.0 --port 5173"
     volumes:
       - ./frontend:/app
