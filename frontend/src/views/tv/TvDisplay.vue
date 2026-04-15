@@ -17,6 +17,16 @@ let timer: number | undefined;
 
 const highlightStatuses = new Set(["assigned", "in_service"]);
 
+function primaryRow(): TvRow | null {
+  const highlighted = rows.value.find((row) => highlightStatuses.has(row.status));
+  return highlighted || rows.value[0] || null;
+}
+
+function upcomingRows(): TvRow[] {
+  const current = primaryRow();
+  return rows.value.filter((row) => row.queue_number !== current?.queue_number).slice(0, 5);
+}
+
 function statusClass(status: string): string {
   return `status-pill ${status}`;
 }
@@ -49,10 +59,10 @@ onUnmounted(() => {
         <p class="tv-kicker">{{ t("tv.highlight") }}</p>
         <h2 style="margin-top: 6px">{{ t("app.brand") }}</h2>
 
-        <template v-if="rows.length">
+        <template v-if="primaryRow()">
           <p class="tv-kicker" style="margin-top: 26px">{{ t("tv.queueNo") }}</p>
-          <p class="tv-number">{{ rows[0].queue_number }}</p>
-          <div class="tv-desk">{{ t("tv.serviceWindow") }} #{{ rows[0].instructor_number ?? "—" }}</div>
+          <p class="tv-number">{{ primaryRow()?.queue_number }}</p>
+          <div class="tv-desk">{{ t("tv.serviceWindow") }} #{{ primaryRow()?.instructor_number ?? "—" }}</div>
         </template>
 
         <p v-else class="muted" style="margin-top: 16px">{{ t("tv.empty") }}</p>
@@ -63,7 +73,7 @@ onUnmounted(() => {
           <p style="font-size: 1.1rem; font-weight: 700">{{ t("tv.nextInLine") }}</p>
           <div class="list-stack" style="margin-top: 10px">
             <div
-              v-for="row in rows.slice(1, 6)"
+              v-for="row in upcomingRows()"
               :key="row.queue_number"
               class="tv-row"
               :class="{ highlighted: highlightStatuses.has(row.status) }"

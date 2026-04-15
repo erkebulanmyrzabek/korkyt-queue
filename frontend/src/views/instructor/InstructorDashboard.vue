@@ -159,6 +159,16 @@ onMounted(loadDashboard);
           <p class="muted">{{ t("instructor.queueDesk") }}: #{{ instructor?.instructor_number || "—" }}</p>
           <p class="muted">{{ t("instructor.accepted") }}: {{ instructor?.accepted_count || 0 }}</p>
           <p class="muted">{{ t("instructor.publicTvHint") }}</p>
+          <div class="mini-metrics">
+            <div class="mini-metric">
+              <p class="label">{{ t("instructor.accepted") }}</p>
+              <strong>{{ instructor?.accepted_count || 0 }}</strong>
+            </div>
+            <div class="mini-metric">
+              <p class="label">{{ t("instructor.avgService") }}</p>
+              <strong>{{ t("instructor.avgServiceValue") }}</strong>
+            </div>
+          </div>
         </article>
 
         <article class="card detail-card">

@@ -71,6 +71,10 @@ function statusClass(status: string): string {
   return `status-pill ${status}`;
 }
 
+function workloadPercent(acceptedCount: number): number {
+  return Math.min(100, acceptedCount * 5);
+}
+
 async function loadSummary() {
   loading.value = true;
   error.value = "";
@@ -133,7 +137,7 @@ onMounted(async () => {
 
     <section class="stats-grid">
       <StatCard :title="t('admin.totalQueue')" :value="summary.total_people_in_queue" :caption="t('admin.waitingHint')" variant="blue" />
-      <StatCard :title="t('admin.activeCalls')" :value="summary.active_instructors - summary.available_instructors" :caption="t('admin.activeHint')" variant="violet" />
+      <StatCard :title="t('admin.activeCalls')" :value="Math.max(0, summary.active_instructors - summary.available_instructors)" :caption="t('admin.activeHint')" variant="violet" />
       <StatCard :title="t('admin.servedToday')" :value="summary.users_served_today" :caption="t('admin.servedHint')" variant="green" />
       <StatCard :title="t('admin.avgWait')" :value="t('admin.avgWaitValue')" :caption="t('admin.avgWaitHint')" variant="orange" />
     </section>
@@ -171,7 +175,17 @@ onMounted(async () => {
                 <td>
                   <span :class="statusClass(instructor.status)">{{ t(`status.${instructor.status}`) }}</span>
                 </td>
-                <td>{{ instructor.accepted_count }}</td>
+                <td>
+                  <div class="workload-wrap">
+                    <div class="workload-head">
+                      <span>{{ instructor.accepted_count }} users</span>
+                      <span>{{ workloadPercent(instructor.accepted_count) }}%</span>
+                    </div>
+                    <div class="workload-track">
+                      <div class="workload-fill" :style="{ width: `${workloadPercent(instructor.accepted_count)}%` }" />
+                    </div>
+                  </div>
+                </td>
                 <td>#{{ instructor.instructor_number }}</td>
                 <td>{{ instructor.password || "—" }}</td>
               </tr>

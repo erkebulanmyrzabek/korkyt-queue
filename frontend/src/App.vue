@@ -16,6 +16,7 @@ const navItems = computed(() => [
   { key: "admin", routeName: "admin", label: t("app.roleAdmin") },
   { key: "instructor", routeName: "instructor", label: t("app.roleInstructor") },
   { key: "tv", routeName: "tv", label: t("app.roleTv") },
+  { key: "telegram", routeName: "telegram", label: t("app.roleTelegram") },
 ]);
 
 const shellClass = computed(() => (route.name === "tv" ? "app-shell app-shell-tv" : "app-shell"));
@@ -65,7 +66,6 @@ const isTv = computed(() => route.name === "tv");
             >
               <span>{{ item.label }}</span>
             </RouterLink>
-            <div class="nav-item ghost">{{ t("app.roleTelegram") }}</div>
           </nav>
 
           <div class="token-card">
