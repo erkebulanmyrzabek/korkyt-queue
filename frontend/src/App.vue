@@ -66,16 +66,6 @@ const isTv = computed(() => route.name === "tv");
               <span>{{ item.label }}</span>
             </RouterLink>
           </nav>
-
-          <div class="token-card">
-            <p class="token-title">{{ t("app.systemTokens") }}</p>
-            <div class="token-grid">
-              <span>Radius 16/24</span>
-              <span>Space 4/8/16/24</span>
-              <span>High Contrast</span>
-              <span>State-first UI</span>
-            </div>
-          </div>
         </aside>
 
         <main class="main-content">
