@@ -409,6 +409,11 @@ select {
   background: #fff;
 }
 
+.form-hint {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
 .section-head {
   display: flex;
   justify-content: space-between;
@@ -441,7 +446,7 @@ select {
 
 .credential-row {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr) auto;
+  grid-template-columns: 120px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   border: 1px solid rgba(22, 101, 52, 0.2);
@@ -450,9 +455,29 @@ select {
   padding: 10px;
 }
 
+.credential-label {
+  white-space: nowrap;
+}
+
+.credential-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.credential-value {
+  min-width: 0;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  overflow-wrap: anywhere;
+}
+
 .copy-btn {
   min-height: 36px;
   padding: 8px 10px;
+  flex-shrink: 0;
 }
 
 .copy-all-btn {
@@ -838,6 +863,15 @@ select {
   .credential-row {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .credential-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .copy-btn {
+    width: 100%;
   }
 
   .mini-metrics,

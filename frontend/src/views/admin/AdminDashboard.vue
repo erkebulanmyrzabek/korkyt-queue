@@ -51,9 +51,7 @@ const copyFeedback = ref("");
 const search = ref("");
 const instructors = ref<InstructorItem[]>([]);
 const form = reactive({
-  name: "",
   login: "",
-  instructor_number: 1,
 });
 const summary = ref<DashboardSummary>({
   total_people_in_queue: 0,
@@ -116,9 +114,7 @@ async function createInstructor() {
       login: payload.instructor.login,
       password: payload.generated_password,
     };
-    form.name = "";
     form.login = "";
-    form.instructor_number += 1;
     await Promise.all([loadSummary(), loadInstructors()]);
   } catch (err) {
     saveError.value = err instanceof Error ? err.message : "Unknown error";
@@ -258,18 +254,11 @@ onMounted(async () => {
 
           <div class="form-grid">
             <label class="field">
-              <span>{{ t("admin.name") }}</span>
-              <input v-model="form.name" type="text" />
-            </label>
-            <label class="field">
               <span>{{ t("admin.login") }}</span>
               <input v-model="form.login" type="text" />
             </label>
-            <label class="field">
-              <span>{{ t("admin.instructorNumber") }}</span>
-              <input v-model.number="form.instructor_number" type="number" min="1" />
-            </label>
           </div>
+          <p class="muted form-hint">{{ t("admin.autoNumberHint") }}</p>
 
           <div class="header-actions" style="margin-top: 10px">
             <button class="action-button" :disabled="saving" @click="createInstructor">
@@ -281,18 +270,22 @@ onMounted(async () => {
             <p class="label">{{ t("admin.credentialsIssued") }}</p>
             <div class="credential-grid">
               <div class="credential-row">
-                <span class="muted">{{ t("admin.login") }}</span>
-                <strong class="credential-box">{{ generatedCredentials.login }}</strong>
-                <button class="ghost-button copy-btn" type="button" @click="copyLogin">
-                  {{ t("admin.copyLogin") }}
-                </button>
+                <span class="muted credential-label">{{ t("admin.login") }}</span>
+                <div class="credential-main">
+                  <strong class="credential-value">{{ generatedCredentials.login }}</strong>
+                  <button class="ghost-button copy-btn" type="button" @click="copyLogin">
+                    {{ t("admin.copyLogin") }}
+                  </button>
+                </div>
               </div>
               <div class="credential-row">
-                <span class="muted">{{ t("admin.password") }}</span>
-                <strong class="credential-box">{{ generatedCredentials.password }}</strong>
-                <button class="ghost-button copy-btn" type="button" @click="copyPassword">
-                  {{ t("admin.copyPassword") }}
-                </button>
+                <span class="muted credential-label">{{ t("admin.password") }}</span>
+                <div class="credential-main">
+                  <strong class="credential-value">{{ generatedCredentials.password }}</strong>
+                  <button class="ghost-button copy-btn" type="button" @click="copyPassword">
+                    {{ t("admin.copyPassword") }}
+                  </button>
+                </div>
               </div>
             </div>
             <button class="action-button copy-all-btn" type="button" @click="copyAllCredentials">
