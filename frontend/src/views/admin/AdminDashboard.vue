@@ -144,20 +144,6 @@ async function copyText(value: string, feedbackKey: string) {
   }
 }
 
-function copyLogin() {
-  if (!generatedCredentials.value) {
-    return;
-  }
-  void copyText(generatedCredentials.value.login, "admin.loginCopied");
-}
-
-function copyPassword() {
-  if (!generatedCredentials.value) {
-    return;
-  }
-  void copyText(generatedCredentials.value.password, "admin.passwordCopied");
-}
-
 function copyAllCredentials() {
   if (!generatedCredentials.value) {
     return;
@@ -273,18 +259,12 @@ onMounted(async () => {
                 <span class="muted credential-label">{{ t("admin.login") }}</span>
                 <div class="credential-main">
                   <strong class="credential-value">{{ generatedCredentials.login }}</strong>
-                  <button class="ghost-button copy-btn" type="button" @click="copyLogin">
-                    {{ t("admin.copyLogin") }}
-                  </button>
                 </div>
               </div>
               <div class="credential-row">
                 <span class="muted credential-label">{{ t("admin.password") }}</span>
                 <div class="credential-main">
                   <strong class="credential-value">{{ generatedCredentials.password }}</strong>
-                  <button class="ghost-button copy-btn" type="button" @click="copyPassword">
-                    {{ t("admin.copyPassword") }}
-                  </button>
                 </div>
               </div>
             </div>

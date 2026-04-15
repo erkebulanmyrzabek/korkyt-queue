@@ -474,12 +474,6 @@ select {
   overflow-wrap: anywhere;
 }
 
-.copy-btn {
-  min-height: 36px;
-  padding: 8px 10px;
-  flex-shrink: 0;
-}
-
 .copy-all-btn {
   margin-top: 10px;
 }
@@ -870,9 +864,6 @@ select {
     align-items: stretch;
   }
 
-  .copy-btn {
-    width: 100%;
-  }
 
   .mini-metrics,
   .component-grid {
