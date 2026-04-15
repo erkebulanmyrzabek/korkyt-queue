@@ -10,7 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models import Instructor, InstructorStatus, QueueEntry, QueueStatus
-from app.schemas.admin import CreateInstructorRequest, CreateInstructorResponse, InstructorBase
+from app.schemas.admin import (
+    AdminInstructor,
+    CreateInstructorRequest,
+    CreateInstructorResponse,
+    InstructorBase,
+)
 from app.schemas.queue import DashboardSummary
 from app.core.security import hash_password
 
@@ -60,10 +65,29 @@ async def dashboard_summary(session: AsyncSession = Depends(get_db)) -> Dashboar
     )
 
 
-@router.get("/instructors", response_model=list[InstructorBase])
-async def list_instructors(session: AsyncSession = Depends(get_db)) -> list[InstructorBase]:
+@router.get("/instructors", response_model=list[AdminInstructor])
+async def list_instructors(session: AsyncSession = Depends(get_db)) -> list[AdminInstructor]:
     result = await session.execute(select(Instructor).order_by(Instructor.instructor_number.asc()))
-    return [InstructorBase.model_validate(row) for row in result.scalars().all()]
+    instructors = result.scalars().all()
+    has_updates = False
+
+    for instructor in instructors:
+        if instructor.password_plain:
+            continue
+
+        # Backfill legacy records so admin always sees a plain temporary password.
+        generated_password = _generate_password()
+        instructor.password_plain = generated_password
+        instructor.password_hash = hash_password(generated_password)
+        has_updates = True
+
+    if has_updates:
+        await session.commit()
+
+    return [
+        AdminInstructor.model_validate(row).copy(update={"password": row.password_plain})
+        for row in instructors
+    ]
 
 
 @router.post(
@@ -95,6 +119,7 @@ async def create_instructor(
         login=payload.login.strip(),
         instructor_number=payload.instructor_number,
         password_hash=hash_password(generated_password),
+        password_plain=generated_password,
         status=InstructorStatus.available,
         is_active=True,
     )
