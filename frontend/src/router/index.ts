@@ -4,7 +4,6 @@ import { getInstructorToken } from "../api";
 import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import InstructorLogin from "../views/instructor/InstructorLogin.vue";
 import InstructorDashboard from "../views/instructor/InstructorDashboard.vue";
-import TelegramPreview from "../views/telegram/TelegramPreview.vue";
 import TvDisplay from "../views/tv/TvDisplay.vue";
 
 export const router = createRouter({
@@ -49,15 +48,6 @@ export const router = createRouter({
       meta: {
         titleKey: "platform.tvTitle",
         subtitleKey: "platform.tvSubtitle",
-      },
-    },
-    {
-      path: "/telegram",
-      name: "telegram",
-      component: TelegramPreview,
-      meta: {
-        titleKey: "platform.telegramTitle",
-        subtitleKey: "platform.telegramSubtitle",
       },
     },
   ],

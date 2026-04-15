@@ -16,7 +16,6 @@ const navItems = computed(() => [
   { key: "admin", routeName: "admin", label: t("app.roleAdmin") },
   { key: "instructor", routeName: "instructor", label: t("app.roleInstructor") },
   { key: "tv", routeName: "tv", label: t("app.roleTv") },
-  { key: "telegram", routeName: "telegram", label: t("app.roleTelegram") },
 ]);
 
 const shellClass = computed(() => (route.name === "tv" ? "app-shell app-shell-tv" : "app-shell"));
