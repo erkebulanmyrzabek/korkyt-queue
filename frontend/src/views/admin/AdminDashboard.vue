@@ -28,6 +28,11 @@ interface CreateInstructorResponse {
   generated_password: string;
 }
 
+interface GeneratedCredentials {
+  login: string;
+  password: string;
+}
+
 const improvements = [
   "Live updates without manual refresh across admin, instructor, and TV views",
   "Estimated wait time and current position in Telegram",
@@ -41,7 +46,8 @@ const loading = ref(false);
 const error = ref("");
 const saving = ref(false);
 const saveError = ref("");
-const successPassword = ref("");
+const generatedCredentials = ref<GeneratedCredentials | null>(null);
+const copyFeedback = ref("");
 const search = ref("");
 const instructors = ref<InstructorItem[]>([]);
 const form = reactive({
@@ -98,14 +104,18 @@ async function loadInstructors() {
 async function createInstructor() {
   saving.value = true;
   saveError.value = "";
-  successPassword.value = "";
+  generatedCredentials.value = null;
+  copyFeedback.value = "";
 
   try {
     const payload = await apiFetch<CreateInstructorResponse>("/admin/instructors", {
       method: "POST",
       body: JSON.stringify(form),
     });
-    successPassword.value = payload.generated_password;
+    generatedCredentials.value = {
+      login: payload.instructor.login,
+      password: payload.generated_password,
+    };
     form.name = "";
     form.login = "";
     form.instructor_number += 1;
@@ -115,6 +125,49 @@ async function createInstructor() {
   } finally {
     saving.value = false;
   }
+}
+
+async function copyText(value: string, feedbackKey: string) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "absolute";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    copyFeedback.value = t(feedbackKey);
+  } catch {
+    copyFeedback.value = t("admin.copyFailed");
+  }
+}
+
+function copyLogin() {
+  if (!generatedCredentials.value) {
+    return;
+  }
+  void copyText(generatedCredentials.value.login, "admin.loginCopied");
+}
+
+function copyPassword() {
+  if (!generatedCredentials.value) {
+    return;
+  }
+  void copyText(generatedCredentials.value.password, "admin.passwordCopied");
+}
+
+function copyAllCredentials() {
+  if (!generatedCredentials.value) {
+    return;
+  }
+  const pair = `login: ${generatedCredentials.value.login}\npassword: ${generatedCredentials.value.password}`;
+  void copyText(pair, "admin.credentialsCopied");
 }
 
 onMounted(async () => {
@@ -224,9 +277,28 @@ onMounted(async () => {
             </button>
           </div>
 
-          <div v-if="successPassword" class="success-panel">
-            <p class="label">{{ t("admin.generatedPassword") }}</p>
-            <strong class="credential-box">{{ successPassword }}</strong>
+          <div v-if="generatedCredentials" class="success-panel">
+            <p class="label">{{ t("admin.credentialsIssued") }}</p>
+            <div class="credential-grid">
+              <div class="credential-row">
+                <span class="muted">{{ t("admin.login") }}</span>
+                <strong class="credential-box">{{ generatedCredentials.login }}</strong>
+                <button class="ghost-button copy-btn" type="button" @click="copyLogin">
+                  {{ t("admin.copyLogin") }}
+                </button>
+              </div>
+              <div class="credential-row">
+                <span class="muted">{{ t("admin.password") }}</span>
+                <strong class="credential-box">{{ generatedCredentials.password }}</strong>
+                <button class="ghost-button copy-btn" type="button" @click="copyPassword">
+                  {{ t("admin.copyPassword") }}
+                </button>
+              </div>
+            </div>
+            <button class="action-button copy-all-btn" type="button" @click="copyAllCredentials">
+              {{ t("admin.copyAllCredentials") }}
+            </button>
+            <p v-if="copyFeedback" class="copy-feedback">{{ copyFeedback }}</p>
           </div>
 
           <p v-if="saveError" class="error-text">{{ saveError }}</p>

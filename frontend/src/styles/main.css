@@ -433,6 +433,38 @@ select {
   font-size: 1.15rem;
 }
 
+.credential-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.credential-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(22, 101, 52, 0.2);
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.copy-btn {
+  min-height: 36px;
+  padding: 8px 10px;
+}
+
+.copy-all-btn {
+  margin-top: 10px;
+}
+
+.copy-feedback {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #166534;
+}
+
 .table-wrapper {
   overflow-x: auto;
   border-radius: 16px;
@@ -801,6 +833,11 @@ select {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .credential-row {
+    grid-template-columns: 1fr;
+    align-items: start;
   }
 
   .mini-metrics,
