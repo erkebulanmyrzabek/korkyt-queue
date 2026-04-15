@@ -15,6 +15,12 @@ const rows = ref<TvRow[]>([]);
 const error = ref("");
 let timer: number | undefined;
 
+const highlightStatuses = new Set(["assigned", "in_service"]);
+
+function statusClass(status: string): string {
+  return `status-pill ${status}`;
+}
+
 async function loadRows() {
   try {
     rows.value = await apiFetch<TvRow[]>("/queue/tv");
@@ -37,40 +43,49 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="view-stack tv-mode">
-    <header class="hero card tv-hero">
-      <div>
-        <p class="eyebrow">{{ t("app.eyebrow") }}</p>
-        <h2>{{ t("tv.title") }}</h2>
-        <p class="muted">{{ t("tv.subtitle") }}</p>
-      </div>
-    </header>
+  <section class="tv-mode">
+    <div class="tv-grid">
+      <article class="tv-highlight">
+        <p class="tv-kicker">{{ t("tv.highlight") }}</p>
+        <h2 style="margin-top: 6px">{{ t("app.brand") }}</h2>
 
-    <section class="card table-card">
-      <table class="queue-table">
-        <thead>
-          <tr>
-            <th>{{ t("tv.queue") }}</th>
-            <th>{{ t("tv.status") }}</th>
-            <th>{{ t("tv.instructor") }}</th>
-          </tr>
-        </thead>
-        <tbody v-if="rows.length">
-          <tr
-            v-for="row in rows"
-            :key="row.queue_number"
-            :class="{ highlighted: row.status === 'assigned' || row.status === 'in_service' }"
-          >
-            <td>{{ row.queue_number }}</td>
-            <td>{{ row.status }}</td>
-            <td>{{ row.instructor_number ?? "—" }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <template v-if="rows.length">
+          <p class="tv-kicker" style="margin-top: 26px">{{ t("tv.queueNo") }}</p>
+          <p class="tv-number">{{ rows[0].queue_number }}</p>
+          <div class="tv-desk">{{ t("tv.serviceWindow") }} #{{ rows[0].instructor_number ?? "—" }}</div>
+        </template>
 
-      <p v-if="!rows.length" class="muted">{{ t("tv.empty") }}</p>
-      <p v-if="error" class="error-text">{{ error }}</p>
-    </section>
+        <p v-else class="muted" style="margin-top: 16px">{{ t("tv.empty") }}</p>
+      </article>
+
+      <section class="view-stack">
+        <article class="tv-side-card">
+          <p style="font-size: 1.1rem; font-weight: 700">{{ t("tv.nextInLine") }}</p>
+          <div class="list-stack" style="margin-top: 10px">
+            <div
+              v-for="row in rows.slice(1, 6)"
+              :key="row.queue_number"
+              class="tv-row"
+              :class="{ highlighted: highlightStatuses.has(row.status) }"
+            >
+              <strong style="font-size: 1.45rem">{{ row.queue_number }}</strong>
+              <span :class="statusClass(row.status)">{{ t(`status.${row.status}`) }}</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="tv-note">
+          <p class="tv-kicker">Accessibility</p>
+          <p style="font-size: 1.15rem; margin-top: 6px">{{ t("tv.readability") }}</p>
+          <ul style="margin: 8px 0 0 18px; padding: 0">
+            <li>{{ t("tv.rule1") }}</li>
+            <li>{{ t("tv.rule2") }}</li>
+            <li>{{ t("tv.rule3") }}</li>
+          </ul>
+        </article>
+      </section>
+    </div>
+
+    <p v-if="error" class="error-text" style="margin-top: 10px">{{ error }}</p>
   </section>
 </template>
-
