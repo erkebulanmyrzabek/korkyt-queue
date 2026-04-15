@@ -5,7 +5,7 @@ from secrets import choice
 from string import digits
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -100,24 +100,21 @@ async def create_instructor(
     session: AsyncSession = Depends(get_db),
 ) -> CreateInstructorResponse:
     existing = await session.scalar(
-        select(Instructor).where(
-            or_(
-                Instructor.login == payload.login.strip(),
-                Instructor.instructor_number == payload.instructor_number,
-            )
-        )
+        select(Instructor).where(Instructor.login == payload.login.strip())
     )
     if existing is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Instructor with this login or instructor number already exists.",
+            detail="Instructor with this login already exists.",
         )
 
+    max_instructor_number = await session.scalar(select(func.max(Instructor.instructor_number)))
+    next_instructor_number = (max_instructor_number or 0) + 1
     generated_password = _generate_password()
     instructor = Instructor(
-        name=payload.name.strip(),
+        name=f"Instructor {next_instructor_number}",
         login=payload.login.strip(),
-        instructor_number=payload.instructor_number,
+        instructor_number=next_instructor_number,
         password_hash=hash_password(generated_password),
         password_plain=generated_password,
         status=InstructorStatus.available,

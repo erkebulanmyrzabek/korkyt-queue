@@ -15,6 +15,10 @@ class InstructorBase(BaseModel):
     is_active: bool
 
 
+class AdminInstructor(InstructorBase):
+    password: str | None = None
+
+
 class InstructorCurrentEntry(BaseModel):
     queue_number: str
     iin: str | None = None
@@ -22,9 +26,7 @@ class InstructorCurrentEntry(BaseModel):
 
 
 class CreateInstructorRequest(BaseModel):
-    name: str = Field(min_length=2, max_length=120)
     login: str = Field(min_length=3, max_length=64)
-    instructor_number: int = Field(ge=1)
 
 
 class CreateInstructorResponse(BaseModel):
