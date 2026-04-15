@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import redis.asyncio as redis
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from app.bot.utils import get_user_language, telegram_language_to_supported
+from app.bot.utils import (
+    get_user_language,
+    localized_command_texts,
+    main_keyboard,
+    telegram_language_to_supported,
+)
 from app.core.config import settings
 from app.core.i18n import translate
 from app.db.session import async_session_factory
@@ -17,6 +22,7 @@ redis_client = redis.from_url(settings.redis_url, decode_responses=True)
 
 
 @router.message(Command("queue"))
+@router.message(F.text.in_(localized_command_texts("bot.button.queue")))
 async def command_queue(message: Message) -> None:
     if not message.from_user:
         return
@@ -32,14 +38,20 @@ async def command_queue(message: Message) -> None:
     if counter == 1:
         await redis_client.expire(rate_limit_key, 60)
     if counter > 1:
-        await message.answer(translate("queue.rate_limit", language))
+        await message.answer(
+            translate("queue.rate_limit", language),
+            reply_markup=main_keyboard(language),
+        )
         return
 
     async with async_session_factory() as session:
         payload = await queue_service.get_position(session=session, telegram_id=telegram_id)
 
     if not payload:
-        await message.answer(translate("queue.not_found", language))
+        await message.answer(
+            translate("queue.not_found", language),
+            reply_markup=main_keyboard(language),
+        )
         return
 
     await message.answer(
@@ -48,6 +60,7 @@ async def command_queue(message: Message) -> None:
             language,
             queue_number=payload["queue_number"],
             ahead=payload["ahead"],
-        )
+        ),
+        reply_markup=main_keyboard(language),
     )
 

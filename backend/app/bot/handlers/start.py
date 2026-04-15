@@ -6,7 +6,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from app.bot.states import QueueRegistration
-from app.bot.utils import get_user_language, telegram_language_to_supported
+from app.bot.utils import (
+    get_user_language,
+    main_keyboard,
+    localized_command_texts,
+    telegram_language_to_supported,
+)
 from app.core.config import settings
 from app.core.i18n import translate
 from app.db.session import async_session_factory
@@ -17,6 +22,7 @@ queue_service = QueueService()
 
 
 @router.message(CommandStart())
+@router.message(F.text.in_(localized_command_texts("bot.button.start")))
 async def command_start(message: Message, state: FSMContext) -> None:
     if not message.from_user:
         return
@@ -37,13 +43,17 @@ async def command_start(message: Message, state: FSMContext) -> None:
                 "queue.already_in_queue",
                 language,
                 queue_number=active_entry.queue_number,
-            )
+            ),
+            reply_markup=main_keyboard(language),
         )
         await state.clear()
         return
 
     await state.set_state(QueueRegistration.waiting_for_iin)
-    await message.answer(translate("bot.ask_iin", language))
+    await message.answer(
+        translate("bot.ask_iin", language),
+        reply_markup=main_keyboard(language),
+    )
 
 
 @router.message(QueueRegistration.waiting_for_iin, F.text)
@@ -57,12 +67,18 @@ async def receive_iin(message: Message, state: FSMContext) -> None:
     )
     iin = "".join(char for char in message.text.strip() if char.isdigit())
     if len(iin) != 12:
-        await message.answer(translate("bot.invalid_iin", language))
+        await message.answer(
+            translate("bot.invalid_iin", language),
+            reply_markup=main_keyboard(language),
+        )
         return
 
     await state.update_data(iin=iin)
     await state.set_state(QueueRegistration.waiting_for_photo)
-    await message.answer(translate("bot.ask_photo", language))
+    await message.answer(
+        translate("bot.ask_photo", language),
+        reply_markup=main_keyboard(language),
+    )
 
 
 @router.message(QueueRegistration.waiting_for_photo, F.photo)
@@ -78,7 +94,10 @@ async def receive_photo(message: Message, state: FSMContext, bot: Bot) -> None:
     iin = state_data.get("iin")
     if not iin:
         await state.set_state(QueueRegistration.waiting_for_iin)
-        await message.answer(translate("bot.ask_iin", language))
+        await message.answer(
+            translate("bot.ask_iin", language),
+            reply_markup=main_keyboard(language),
+        )
         return
 
     photos_dir = settings.media_root_path / "photos"
@@ -98,7 +117,8 @@ async def receive_photo(message: Message, state: FSMContext, bot: Bot) -> None:
 
     await state.clear()
     await message.answer(
-        translate("queue.join_success", language, queue_number=entry.queue_number)
+        translate("queue.join_success", language, queue_number=entry.queue_number),
+        reply_markup=main_keyboard(language),
     )
 
 
@@ -111,4 +131,7 @@ async def receive_invalid_photo(message: Message) -> None:
         message.from_user.id,
         fallback=telegram_language_to_supported(message.from_user.language_code),
     )
-    await message.answer(translate("bot.ask_photo", language))
+    await message.answer(
+        translate("bot.ask_photo", language),
+        reply_markup=main_keyboard(language),
+    )

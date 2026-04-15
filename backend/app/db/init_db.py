@@ -16,6 +16,7 @@ async def init_db() -> None:
         await connection.run_sync(Base.metadata.create_all)
         # Lightweight bootstrap migration for existing dev volumes.
         await connection.execute(text("ALTER TABLE instructors ADD COLUMN IF NOT EXISTS login VARCHAR(64)"))
+        await connection.execute(text("ALTER TABLE instructors ADD COLUMN IF NOT EXISTS password_plain VARCHAR(255)"))
         await connection.execute(text("UPDATE instructors SET login = CONCAT('instr', instructor_number) WHERE login IS NULL"))
         await connection.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_instructors_login ON instructors (login)"))
 
@@ -29,6 +30,7 @@ async def init_db() -> None:
                         login=f"instr{number}",
                         instructor_number=number,
                         password_hash=hash_password(f"10000{number}"),
+                        password_plain=f"10000{number}",
                         status=InstructorStatus.available,
                         is_active=True,
                     )

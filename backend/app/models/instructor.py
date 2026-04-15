@@ -21,6 +21,7 @@ class Instructor(Base):
     login: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     instructor_number: Mapped[int] = mapped_column(Integer, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_plain: Mapped[str | None] = mapped_column(String(255), nullable=True)
     status: Mapped[InstructorStatus] = mapped_column(
         Enum(InstructorStatus, name="instructor_status"),
         default=InstructorStatus.offline,

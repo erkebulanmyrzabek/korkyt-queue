@@ -4,7 +4,12 @@
     "ask_photo": "Енді суретіңізді жіберіңіз.",
     "invalid_iin": "ЖСН 12 таңбадан тұруы керек.",
     "language_select": "Интерфейс тілін таңдаңыз.",
-    "language_updated": "Тіл жаңартылды: {language_name}."
+    "language_updated": "Тіл жаңартылды: {language_name}.",
+    "button": {
+      "start": "Бастау",
+      "queue": "Кезек",
+      "language": "Тіл"
+    }
   },
   "queue": {
     "join_success": "Сіз кезекке сәтті тіркелдіңіз.\nКезек нөміріңіз: {queue_number}",

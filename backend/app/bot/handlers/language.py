@@ -5,7 +5,12 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from sqlalchemy import select
 
-from app.bot.utils import get_user_language, telegram_language_to_supported
+from app.bot.utils import (
+    get_user_language,
+    localized_command_texts,
+    main_keyboard,
+    telegram_language_to_supported,
+)
 from app.core.i18n import SUPPORTED_LANGUAGES, translate
 from app.db.session import async_session_factory
 from app.models import User
@@ -26,6 +31,7 @@ def language_keyboard() -> InlineKeyboardMarkup:
 
 
 @router.message(Command("language"))
+@router.message(F.text.in_(localized_command_texts("bot.button.language")))
 async def command_language(message: Message) -> None:
     if not message.from_user:
         return
@@ -66,6 +72,9 @@ async def change_language(callback: CallbackQuery) -> None:
         language_name=SUPPORTED_LANGUAGES[language],
     )
     if callback.message:
-        await callback.message.edit_text(updated_text)
+        await callback.message.answer(
+            updated_text,
+            reply_markup=main_keyboard(language),
+        )
     await callback.answer()
 

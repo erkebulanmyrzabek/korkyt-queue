@@ -1,0 +1,802 @@
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Bell,
+  CheckCircle2,
+  ChevronRight,
+  Clock3,
+  Globe,
+  LayoutDashboard,
+  Monitor,
+  PlayCircle,
+  Plus,
+  Search,
+  Shield,
+  Tv,
+  User,
+  UserSquare2,
+  Users,
+  XCircle,
+  Camera,
+  Languages,
+  Activity,
+  ArrowRight,
+  BadgeCheck,
+  CircleDot,
+  TimerReset,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
+
+const dict = {
+  ru: {
+    product: "Korkyt Queue",
+    subtitle: "Электронная очередь для Telegram, инструкторов, администраторов и TV-табло",
+    admin: "Администратор",
+    instructor: "Инструктор",
+    tv: "TV экран",
+    telegram: "Telegram",
+    dashboard: "Дашборд",
+    metrics: "Метрики",
+    waiting: "Ожидают",
+    active: "Вызваны",
+    completed: "Завершено сегодня",
+    avgWait: "Среднее ожидание",
+    activeInstructors: "Активные инструкторы",
+    createInstructor: "Создать инструктора",
+    fullName: "ФИО",
+    login: "Логин",
+    password: "Пароль",
+    tempPassword: "Временный пароль",
+    create: "Создать",
+    instructors: "Список инструкторов",
+    status: "Статус",
+    workload: "Нагрузка",
+    actions: "Действия",
+    available: "Свободен",
+    busy: "Обслуживает",
+    offline: "Не в сети",
+    nextUser: "Следующий",
+    complete: "Завершить",
+    currentUser: "Текущий пользователь",
+    queueNo: "Номер очереди",
+    userPhoto: "Фото пользователя",
+    iin: "ИИН",
+    position: "Позиция",
+    eta: "Ожидание",
+    call: "Вызов",
+    monitor: "Мониторинг",
+    highlight: "Активный вызов",
+    nextInLine: "Следующие в очереди",
+    notifications: "Уведомления",
+    language: "Язык",
+    theme: "Светлая тема",
+    queueControl: "Управление очередью",
+    liveQueue: "Живая очередь",
+    search: "Поиск",
+    summary: "Сводка",
+    serviceWindow: "Компьютер",
+    enterIIN: "Введите ИИН",
+    sendPhoto: "Отправьте фото",
+    yourTicket: "Ваш номер",
+    waitNotice: "Ожидайте уведомления о вызове",
+    calledTo: "Подойдите к компьютеру",
+    topImprovements: "Ключевые UX-улучшения",
+    systemTokens: "Дизайн-токены",
+    components: "Компоненты",
+    loading: "Загрузка",
+    error: "Ошибка",
+    empty: "Пусто",
+    retry: "Повторить",
+    noData: "Данных пока нет",
+    live: "Live",
+  },
+  kk: {
+    product: "Korkyt Queue",
+    subtitle: "Telegram, нұсқаушы, әкімші және TV-таблоға арналған электрондық кезек",
+    admin: "Әкімші",
+    instructor: "Нұсқаушы",
+    tv: "TV экран",
+    telegram: "Telegram",
+    dashboard: "Басқару панелі",
+    metrics: "Метрикалар",
+    waiting: "Күтіп тұр",
+    active: "Шақырылған",
+    completed: "Бүгін аяқталды",
+    avgWait: "Орташа күту",
+    activeInstructors: "Белсенді нұсқаушылар",
+    createInstructor: "Нұсқаушы қосу",
+    fullName: "Аты-жөні",
+    login: "Логин",
+    password: "Құпиясөз",
+    tempPassword: "Уақытша құпиясөз",
+    create: "Қосу",
+    instructors: "Нұсқаушылар тізімі",
+    status: "Күйі",
+    workload: "Жүктеме",
+    actions: "Әрекеттер",
+    available: "Бос",
+    busy: "Қызмет көрсетуде",
+    offline: "Желіде емес",
+    nextUser: "Келесі",
+    complete: "Аяқтау",
+    currentUser: "Ағымдағы пайдаланушы",
+    queueNo: "Кезек нөмірі",
+    userPhoto: "Пайдаланушы суреті",
+    iin: "ЖСН",
+    position: "Орны",
+    eta: "Күту уақыты",
+    call: "Шақыру",
+    monitor: "Бақылау",
+    highlight: "Белсенді шақыру",
+    nextInLine: "Келесі нөмірлер",
+    notifications: "Хабарламалар",
+    language: "Тіл",
+    theme: "Жарық тема",
+    queueControl: "Кезекті басқару",
+    liveQueue: "Тікелей кезек",
+    search: "Іздеу",
+    summary: "Жалпы көрініс",
+    serviceWindow: "Компьютер",
+    enterIIN: "ЖСН енгізіңіз",
+    sendPhoto: "Сурет жіберіңіз",
+    yourTicket: "Сіздің нөміріңіз",
+    waitNotice: "Шақыру хабарламасын күтіңіз",
+    calledTo: "Компьютерге келіңіз",
+    topImprovements: "Негізгі UX жақсартулары",
+    systemTokens: "Дизайн токендері",
+    components: "Компоненттер",
+    loading: "Жүктелуде",
+    error: "Қате",
+    empty: "Бос",
+    retry: "Қайталау",
+    noData: "Әзірге дерек жоқ",
+    live: "Live",
+  },
+  en: {
+    product: "Korkyt Queue",
+    subtitle: "Queue platform for Telegram users, instructors, admin panel, and TV board",
+    admin: "Admin",
+    instructor: "Instructor",
+    tv: "TV Screen",
+    telegram: "Telegram",
+    dashboard: "Dashboard",
+    metrics: "Metrics",
+    waiting: "Waiting",
+    active: "Active",
+    completed: "Completed today",
+    avgWait: "Avg wait",
+    activeInstructors: "Active instructors",
+    createInstructor: "Create instructor",
+    fullName: "Full name",
+    login: "Login",
+    password: "Password",
+    tempPassword: "Temporary password",
+    create: "Create",
+    instructors: "Instructor list",
+    status: "Status",
+    workload: "Workload",
+    actions: "Actions",
+    available: "Available",
+    busy: "Serving",
+    offline: "Offline",
+    nextUser: "Next user",
+    complete: "Complete",
+    currentUser: "Current user",
+    queueNo: "Queue number",
+    userPhoto: "User photo",
+    iin: "IIN",
+    position: "Position",
+    eta: "ETA",
+    call: "Call",
+    monitor: "Monitoring",
+    highlight: "Active call",
+    nextInLine: "Next in line",
+    notifications: "Notifications",
+    language: "Language",
+    theme: "Light theme",
+    queueControl: "Queue control",
+    liveQueue: "Live queue",
+    search: "Search",
+    summary: "Summary",
+    serviceWindow: "Computer",
+    enterIIN: "Enter IIN",
+    sendPhoto: "Send photo",
+    yourTicket: "Your ticket",
+    waitNotice: "Wait for the call notification",
+    calledTo: "Please proceed to computer",
+    topImprovements: "Top UX improvements",
+    systemTokens: "Design tokens",
+    components: "Components",
+    loading: "Loading",
+    error: "Error",
+    empty: "Empty",
+    retry: "Retry",
+    noData: "No data yet",
+    live: "Live",
+  },
+};
+
+const queue = [
+  { code: "Q-034", iin: "030812******", photo: "AU", status: "active", desk: 2, eta: "Now", position: 0 },
+  { code: "Q-035", iin: "041103******", photo: "MN", status: "waiting", desk: null, eta: "3 min", position: 1 },
+  { code: "Q-036", iin: "010225******", photo: "DK", status: "waiting", desk: null, eta: "6 min", position: 2 },
+  { code: "Q-037", iin: "990412******", photo: "AS", status: "waiting", desk: null, eta: "9 min", position: 3 },
+  { code: "Q-038", iin: "020905******", photo: "ER", status: "waiting", desk: null, eta: "12 min", position: 4 },
+  { code: "Q-039", iin: "050731******", photo: "ZT", status: "waiting", desk: null, eta: "15 min", position: 5 },
+];
+
+const instructorsSeed = [
+  { id: 1, name: "Aigerim S.", login: "instr_01", status: "busy", handled: 16, desk: 2 },
+  { id: 2, name: "Nursultan K.", login: "instr_02", status: "available", handled: 12, desk: 3 },
+  { id: 3, name: "Madina T.", login: "instr_03", status: "available", handled: 10, desk: 4 },
+  { id: 4, name: "Daniyar A.", login: "instr_04", status: "offline", handled: 0, desk: 5 },
+];
+
+const improvements = [
+  "Live updates without manual refresh across admin, instructor, and TV views",
+  "Estimated wait time and current position in Telegram",
+  "One-tap instructor workflow: Available → Next → Complete",
+  "Large-surface status hierarchy for fast visual scanning",
+  "TV mode optimized for 5–10 meter readability",
+  "Localization-ready microcopy with consistent label lengths",
+  "Empty / loading / error states for every key block",
+  "Priority alerts for stuck queue or inactive instructors",
+  "Metrics focused on throughput, wait time, and service load",
+  "Component system with predictable sizes, states, and spacing",
+];
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
+function MetricCard({ title, value, hint, icon: Icon, accent = "from-blue-500/20 to-cyan-400/10" }) {
+  return (
+    <Card className="overflow-hidden border-slate-200/80 bg-white/90 backdrop-blur">
+      <CardContent className="p-0">
+        <div className={cn("bg-gradient-to-br p-5", accent)}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-sm text-slate-500">{title}</div>
+              <div className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{value}</div>
+              <div className="mt-1 text-xs text-slate-500">{hint}</div>
+            </div>
+            <div className="rounded-2xl bg-white/70 p-3 shadow-sm">
+              <Icon className="h-5 w-5 text-slate-700" />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatusBadge({ status, t }) {
+  const map = {
+    available: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    busy: "bg-amber-50 text-amber-700 border-amber-200",
+    offline: "bg-slate-100 text-slate-600 border-slate-200",
+    waiting: "bg-blue-50 text-blue-700 border-blue-200",
+    active: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200",
+    completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  };
+  const labels = {
+    available: t.available,
+    busy: t.busy,
+    offline: t.offline,
+    waiting: t.waiting,
+    active: t.active,
+    completed: t.completed,
+  };
+  return <Badge variant="outline" className={cn("rounded-full px-3 py-1 text-xs font-medium", map[status])}>{labels[status] || status}</Badge>;
+}
+
+function SectionTitle({ icon: Icon, title, desc, right }) {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3">
+        <div className="rounded-2xl bg-slate-100 p-2.5"><Icon className="h-5 w-5 text-slate-700" /></div>
+        <div>
+          <div className="text-lg font-semibold text-slate-950">{title}</div>
+          {desc && <div className="text-sm text-slate-500">{desc}</div>}
+        </div>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+function Shell({ t, lang, setLang, role, setRole, children }) {
+  const roles = [
+    { key: "admin", label: t.admin, icon: Shield },
+    { key: "instructor", label: t.instructor, icon: UserSquare2 },
+    { key: "tv", label: t.tv, icon: Tv },
+    { key: "telegram", label: t.telegram, icon: Bell },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.10),_transparent_25%),linear-gradient(to_bottom,#f8fafc,#eef4ff)] text-slate-900">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-[28px] border border-white/60 bg-white/70 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6">
+          <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-[24px] bg-slate-950 p-3 text-white shadow-lg shadow-slate-950/10">
+                <CircleDot className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t.product}</h1>
+                  <Badge className="rounded-full bg-emerald-500 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white hover:bg-emerald-500">{t.live}</Badge>
+                </div>
+                <p className="mt-1 max-w-2xl text-sm text-slate-500 sm:text-base">{t.subtitle}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2">
+                <Languages className="h-4 w-4 text-slate-500" />
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                  className="bg-transparent text-sm outline-none"
+                >
+                  <option value="ru">RU</option>
+                  <option value="kk">KK</option>
+                  <option value="en">EN</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2">
+                <Monitor className="h-4 w-4 text-slate-500" />
+                <span className="text-sm text-slate-600">{t.theme}</span>
+                <Switch checked />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+            <aside className="rounded-[24px] border border-slate-200/80 bg-slate-50/80 p-3">
+              <div className="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Preview roles</div>
+              <div className="space-y-2">
+                {roles.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => setRole(key)}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition",
+                      role === key ? "bg-slate-950 text-white shadow-lg" : "bg-white text-slate-700 hover:bg-slate-100"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <div className="flex-1">
+                      <div className="font-medium">{label}</div>
+                      <div className={cn("text-xs", role === key ? "text-slate-300" : "text-slate-400")}>{key}</div>
+                    </div>
+                    <ChevronRight className={cn("h-4 w-4", role === key ? "text-white" : "text-slate-400")} />
+                  </button>
+                ))}
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="rounded-2xl bg-slate-950 p-4 text-white">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Activity className="h-4 w-4" />
+                  {t.systemTokens}
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                  <div className="rounded-xl bg-white/10 p-3">Radius 16 / 24</div>
+                  <div className="rounded-xl bg-white/10 p-3">Space 4 / 8 / 16 / 24</div>
+                  <div className="rounded-xl bg-white/10 p-3">Inter / system</div>
+                  <div className="rounded-xl bg-white/10 p-3">WCAG contrast</div>
+                </div>
+              </div>
+            </aside>
+
+            <main>{children}</main>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminView({ t }) {
+  const [rows] = useState(instructorsSeed);
+
+  return (
+    <div className="space-y-4">
+      <SectionTitle
+        icon={LayoutDashboard}
+        title={t.dashboard}
+        desc="High-signal admin dashboard with metrics, instructor control, and queue visibility"
+        right={<Button className="rounded-2xl"><Plus className="mr-2 h-4 w-4" /> {t.createInstructor}</Button>}
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard title={t.waiting} value="42" hint="Peak expected in 15 minutes" icon={Clock3} accent="from-blue-500/20 to-cyan-400/10" />
+        <MetricCard title={t.active} value="6" hint="Currently assigned to instructors" icon={PlayCircle} accent="from-fuchsia-500/20 to-violet-400/10" />
+        <MetricCard title={t.completed} value="138" hint="+12% vs yesterday" icon={CheckCircle2} accent="from-emerald-500/20 to-lime-400/10" />
+        <MetricCard title={t.avgWait} value="11m 20s" hint="Target under 15 minutes" icon={TimerReset} accent="from-amber-500/20 to-orange-400/10" />
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <Card className="rounded-[24px] border-slate-200/80">
+          <CardHeader>
+            <SectionTitle icon={Users} title={t.instructors} desc="Action-oriented management table with live status and workload" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="relative max-w-sm flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input className="rounded-2xl pl-10" placeholder={t.search} />
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Badge variant="outline" className="rounded-full">{t.activeInstructors}: 3</Badge>
+                <Badge variant="outline" className="rounded-full">Desk sync: OK</Badge>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-slate-200">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50 hover:bg-slate-50">
+                    <TableHead>{t.fullName}</TableHead>
+                    <TableHead>{t.login}</TableHead>
+                    <TableHead>{t.status}</TableHead>
+                    <TableHead>{t.workload}</TableHead>
+                    <TableHead>{t.serviceWindow}</TableHead>
+                    <TableHead className="text-right">{t.actions}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="font-medium">{row.name}</TableCell>
+                      <TableCell className="text-slate-500">{row.login}</TableCell>
+                      <TableCell><StatusBadge status={row.status} t={t} /></TableCell>
+                      <TableCell>
+                        <div className="min-w-[120px] space-y-1">
+                          <div className="flex justify-between text-xs text-slate-500"><span>{row.handled} users</span><span>{Math.min(100, row.handled * 5)}%</span></div>
+                          <Progress value={Math.min(100, row.handled * 5)} className="h-2" />
+                        </div>
+                      </TableCell>
+                      <TableCell>#{row.desk}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" className="rounded-xl">Reset</Button>
+                          <Button className="rounded-xl">View</Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4">
+          <Card className="rounded-[24px] border-slate-200/80">
+            <CardHeader>
+              <SectionTitle icon={Plus} title={t.createInstructor} desc="Fast, low-friction creation with a temporary password handoff" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Input className="rounded-2xl" placeholder={t.fullName} />
+              <Input className="rounded-2xl" placeholder={t.login} />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input className="rounded-2xl" placeholder={t.password} type="password" />
+                <Input className="rounded-2xl" placeholder={t.tempPassword} value="482193" readOnly />
+              </div>
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                Temporary credentials should be shown once and copied securely for the instructor.
+              </div>
+              <Button className="w-full rounded-2xl py-6 text-base">{t.create}</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[24px] border-slate-200/80">
+            <CardHeader>
+              <SectionTitle icon={Bell} title={t.topImprovements} desc="Priority UX changes with the highest operational impact" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {improvements.slice(0, 5).map((item, idx) => (
+                <div key={idx} className="flex items-start gap-3 rounded-2xl border border-slate-200 p-3">
+                  <div className="mt-0.5 rounded-full bg-slate-950 px-2 py-0.5 text-[10px] font-semibold text-white">0{idx + 1}</div>
+                  <p className="text-sm text-slate-600">{item}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InstructorView({ t }) {
+  const [available, setAvailable] = useState(true);
+  const active = queue[0];
+  const next = queue[1];
+
+  return (
+    <div className="space-y-4">
+      <SectionTitle
+        icon={UserSquare2}
+        title={t.queueControl}
+        desc="One-screen operational flow optimized for speed, confidence, and minimal decision fatigue"
+        right={<StatusBadge status={available ? "available" : "busy"} t={t} />}
+      />
+
+      <div className="grid gap-4 xl:grid-cols-[0.72fr_1.28fr]">
+        <div className="space-y-4">
+          <Card className="rounded-[24px] border-slate-200/80 bg-white">
+            <CardHeader>
+              <SectionTitle icon={User} title="Aigerim S." desc="Instructor profile · Desk #2" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div>
+                  <div className="text-sm font-medium text-slate-900">{t.available}</div>
+                  <div className="text-sm text-slate-500">Ready to receive the next user</div>
+                </div>
+                <Switch checked={available} onCheckedChange={setAvailable} />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button className="rounded-2xl py-6 text-base"><ArrowRight className="mr-2 h-4 w-4" />{t.nextUser}</Button>
+                <Button variant="outline" className="rounded-2xl py-6 text-base border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"><CheckCircle2 className="mr-2 h-4 w-4" />{t.complete}</Button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 p-4">
+                  <div className="text-xs uppercase tracking-[0.14em] text-slate-400">Handled today</div>
+                  <div className="mt-2 text-2xl font-semibold text-slate-950">16</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 p-4">
+                  <div className="text-xs uppercase tracking-[0.14em] text-slate-400">Avg service time</div>
+                  <div className="mt-2 text-2xl font-semibold text-slate-950">7m 10s</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[24px] border-slate-200/80">
+            <CardHeader>
+              <SectionTitle icon={Clock3} title={t.nextInLine} desc="Context preview reduces uncertainty before pressing Next" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {queue.slice(1, 4).map((item) => (
+                <div key={item.code} className="flex items-center justify-between rounded-2xl border border-slate-200 p-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-11 w-11 border border-slate-200"><AvatarFallback>{item.photo}</AvatarFallback></Avatar>
+                    <div>
+                      <div className="font-medium text-slate-900">{item.code}</div>
+                      <div className="text-sm text-slate-500">{t.position}: {item.position}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-slate-900">{item.eta}</div>
+                    <div className="text-xs text-slate-500">{t.eta}</div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="rounded-[28px] border-slate-200/80 bg-[linear-gradient(180deg,#ffffff,rgba(241,245,249,0.75))]">
+          <CardHeader>
+            <SectionTitle icon={BadgeCheck} title={t.currentUser} desc="The currently assigned record is the visual focus of the whole screen" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+              <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 p-5">
+                <div className="flex h-full min-h-[280px] flex-col items-center justify-center rounded-[20px] border border-slate-200 bg-white p-5 text-center">
+                  <div className="mb-4 rounded-3xl bg-slate-100 p-5">
+                    <Camera className="h-10 w-10 text-slate-500" />
+                  </div>
+                  <div className="text-sm font-medium text-slate-900">{t.userPhoto}</div>
+                  <div className="mt-1 text-sm text-slate-500">High-confidence preview for verification</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-[24px] bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/15">
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t.queueNo}</div>
+                  <div className="mt-3 text-6xl font-semibold tracking-tight">{active.code}</div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Badge className="rounded-full bg-white/10 px-3 py-1 text-white hover:bg-white/10">{t.serviceWindow} #{active.desk}</Badge>
+                    <Badge className="rounded-full bg-fuchsia-500/20 px-3 py-1 text-fuchsia-100 hover:bg-fuchsia-500/20">{t.highlight}</Badge>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <div className="text-xs uppercase tracking-[0.14em] text-slate-400">{t.iin}</div>
+                    <div className="mt-2 text-2xl font-semibold text-slate-950">{active.iin}</div>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <div className="text-xs uppercase tracking-[0.14em] text-slate-400">{t.nextUser}</div>
+                    <div className="mt-2 text-2xl font-semibold text-slate-950">{next.code}</div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                  Always keep the primary actions fixed and visible. The instructor should never scroll to call the next person.
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function TVView({ t }) {
+  const current = queue[0];
+  const upcoming = queue.slice(1, 6);
+
+  return (
+    <div className="rounded-[32px] bg-black p-4 shadow-2xl shadow-cyan-500/10 sm:p-6">
+      <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <motion.div
+          initial={{ opacity: 0.9, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="rounded-[28px] border border-cyan-400/30 bg-[radial-gradient(circle_at_top,rgba(0,229,255,0.18),transparent_35%),linear-gradient(180deg,rgba(15,23,42,0.3),rgba(15,23,42,0.7))] p-6 text-white"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">{t.highlight}</div>
+              <div className="mt-2 text-2xl font-medium text-white/90">{t.product}</div>
+            </div>
+            <Badge className="rounded-full bg-cyan-400/10 px-4 py-1 text-cyan-200 hover:bg-cyan-400/10">{t.live}</Badge>
+          </div>
+
+          <div className="mt-12">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.code}
+                initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 1.02, y: -8 }}
+                transition={{ duration: 0.45 }}
+              >
+                <div className="text-[20px] uppercase tracking-[0.32em] text-cyan-200/80">{t.queueNo}</div>
+                <div className="mt-3 text-[84px] font-semibold leading-none tracking-tight text-white sm:text-[120px]">{current.code}</div>
+                <div className="mt-8 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-3xl font-medium text-emerald-300">
+                  {t.serviceWindow} #{current.desk}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
+
+        <div className="space-y-4">
+          <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 text-white backdrop-blur">
+            <div className="text-lg font-medium text-white">{t.nextInLine}</div>
+            <div className="mt-5 space-y-3">
+              {upcoming.map((item, idx) => (
+                <div key={item.code} className={cn(
+                  "flex items-center justify-between rounded-2xl border px-5 py-4",
+                  idx === 0 ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-100" : "border-white/10 bg-white/5 text-white"
+                )}>
+                  <div className="text-3xl font-semibold tracking-tight">{item.code}</div>
+                  <div className="text-right text-sm text-white/70">{item.eta}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-amber-100">
+            <div className="text-sm uppercase tracking-[0.22em] text-amber-200/80">Accessibility</div>
+            <div className="mt-3 text-xl font-medium">5–10 meter readability</div>
+            <ul className="mt-4 space-y-2 text-sm text-amber-50/85">
+              <li>• High contrast black background + luminous accent</li>
+              <li>• Large numeric hierarchy with minimal visual noise</li>
+              <li>• Motion only for important number changes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TelegramView({ t }) {
+  return (
+    <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
+      <Card className="rounded-[28px] border-slate-200/80 bg-[#17212b] text-white shadow-xl">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white">Telegram Bot</CardTitle>
+              <CardDescription className="text-slate-300">Role-specific user journey with clear step reduction</CardDescription>
+            </div>
+            <Badge className="rounded-full bg-sky-500 px-3 py-1 text-white hover:bg-sky-500">Bot</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[
+            { from: "bot", text: "/start" },
+            { from: "app", text: t.enterIIN },
+            { from: "user", text: "030812123456" },
+            { from: "app", text: t.sendPhoto },
+            { from: "user", text: "📷 photo_uploaded.jpg" },
+            { from: "app", text: `${t.yourTicket}: Q-035\n${t.position}: 1\n${t.eta}: ~3 min\n${t.waitNotice}` },
+            { from: "call", text: `${t.call}! Q-035\n${t.calledTo} #3` },
+          ].map((m, i) => (
+            <div key={i} className={cn("max-w-[82%] rounded-2xl px-4 py-3 text-sm whitespace-pre-line",
+              m.from === "user" && "ml-auto bg-sky-500 text-white",
+              m.from === "app" && "bg-white/10 text-white",
+              m.from === "call" && "border border-emerald-400/30 bg-emerald-400/15 text-emerald-100",
+              m.from === "bot" && "bg-slate-700 text-slate-100"
+            )}>
+              {m.text}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <div className="space-y-4">
+        <Card className="rounded-[24px] border-slate-200/80">
+          <CardHeader>
+            <SectionTitle icon={Bell} title="Telegram UX flow" desc="The user should never wonder what happens next" />
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {[
+              "Single-path onboarding: /start → IIN → photo → ticket",
+              "Human-readable queue number in every confirmation",
+              "Position and ETA after successful registration",
+              "Direct call message with assigned computer number",
+            ].map((text, idx) => (
+              <div key={idx} className="rounded-2xl border border-slate-200 p-4 text-sm text-slate-600">{text}</div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[24px] border-slate-200/80">
+          <CardHeader>
+            <SectionTitle icon={Globe} title={t.components} desc="Cross-role UI primitives designed for consistent implementation in frontend" />
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              "Buttons: primary / secondary / ghost / danger",
+              "Badges: waiting / active / completed / offline",
+              "Cards: metrics / content / action cards",
+              "Inputs: default / focus / error / disabled",
+              "Tables: sticky header + density options",
+              "States: loading / empty / error / success",
+            ].map((text, idx) => (
+              <div key={idx} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">{text}</div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+export default function KorkytQueueUXPrototype() {
+  const [lang, setLang] = useState("ru");
+  const [role, setRole] = useState("admin");
+  const t = useMemo(() => dict[lang], [lang]);
+
+  return (
+    <Shell t={t} lang={lang} setLang={setLang} role={role} setRole={setRole}>
+      {role === "admin" && <AdminView t={t} />}
+      {role === "instructor" && <InstructorView t={t} />}
+      {role === "tv" && <TVView t={t} />}
+      {role === "telegram" && <TelegramView t={t} />}
+    </Shell>
+  );
+}

@@ -4,7 +4,12 @@
     "ask_photo": "Now send your photo.",
     "invalid_iin": "The IIN must contain exactly 12 digits.",
     "language_select": "Choose your interface language.",
-    "language_updated": "Language updated: {language_name}."
+    "language_updated": "Language updated: {language_name}.",
+    "button": {
+      "start": "Start",
+      "queue": "Queue",
+      "language": "Language"
+    }
   },
   "queue": {
     "join_success": "You have successfully joined the queue.\nYour queue number: {queue_number}",

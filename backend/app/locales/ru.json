@@ -4,7 +4,12 @@
     "ask_photo": "Теперь отправьте вашу фотографию.",
     "invalid_iin": "ИИН должен состоять из 12 цифр.",
     "language_select": "Выберите язык интерфейса.",
-    "language_updated": "Язык обновлен: {language_name}."
+    "language_updated": "Язык обновлен: {language_name}.",
+    "button": {
+      "start": "Начать",
+      "queue": "Очередь",
+      "language": "Язык"
+    }
   },
   "queue": {
     "join_success": "Вы успешно встали в очередь.\nВаш номер очереди: {queue_number}",
